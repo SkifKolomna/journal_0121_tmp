@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{#{% load staticfiles %}#}
+{#{% load static %}#}
+{% block content %}
+    {% load tz %}
+    {% localtime on %}
+    <!-- heading_create ends here  блок фильтрации-->
+    {% if errors %}
+        <p style="color: red;">{% for error in errors %}{{ error }}{% endfor %}</p>
+    {% endif %}
+        <nav class="navbar navbar-expand navbar-fixed-top hidden">
+            <form id="tasks_filter" action="" method="POST">{% csrf_token %}
+{% comment %}
+                <div class="filter_row list_filter_row row marl">
+                    <div class="filter_col col-md-2">
+                        <label class="sr-only">РЭУ</label>
+                        <select name="reu" class="form-control" id="reu_id">
+                            <option value="">---- Участок ----</option>
+                            {% for each_reu in reu %}
+                                <option value="{{ each_reu.0 }}" {% if request.POST.reu %}
+                                        {% ifequal each_reu.0 request.POST.reu %}selected
+                                        {% endifequal %}{% endif %}>
+                                    {{ each_reu.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter_col col-md-2">
+                        <label class="sr-only">Статус</label>
+                        <select name="status_task" class="form-control" id="status_task_id">
+                            <option value="">----- Статус -----</option>
+                            <!-- {#                                        <option selected="true" disabled="disabled">Статус</option>#} -->
+                            {% for each_status in status_task %}
+                                <option value="{{ each_status.0 }}" {% if request.POST.status_task %}
+                                        {% ifequal each_status.0 request.POST.status_task %}selected
+                                        {% endifequal %}{% endif %}>
+                                    {{ each_status.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter_col col-md-2">
+                        <label class="sr-only">Статус</label>
+                        <select name="source_task" class="form-control" id="source_task_id">
+                            <option value="">Источник заявки</option>
+                            <!-- {#                                        <option selected="true" disabled="disabled">Статус</option>#} -->
+                            {% for each_source in source_task %}
+                                <option value="{{ each_source.0 }}" {% if request.POST.source_task %}
+                                        {% ifequal each_source.0 request.POST.source_task %}selected
+                                        {% endifequal %}{% endif %}>
+                                    {{ each_source.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter_col col-md-2">
+                        {{ form.media }}
+                        {{ form.filter_time }}
+                        {#                    {{ form.media.css }}#}
+                    </div>
+
+                    <div class="filter_col col-md-2">
+                        <div class="col">
+                            <input name="number_task" id="number_task_id" type="text" class="form-control"
+                                   placeholder="Номер заявки">
+                        </div>
+                    </div>
+                    <div class="filter_col col-md-2">
+                        <div class="col">
+                            <input name="phone_task"
+                                    {% if phone_task %} value={{ phone_task }}{% endif %} id="phone_task_id" type="text"
+                                   class="form-control"
+                                   placeholder="Телефон">
+                        </div>
+                    </div>
+                    <div class="form-check col-1" style="font-size: smaller">
+                        {#                    <input name="checkbox_hide" class="form-check-input" type="checkbox" value={{ checkbox_hide }} id="defaultCheck1">#}
+                        <input name="checkbox_hide" class="form-check-input" type="checkbox"
+                               {% if checkbox_hide %}checked{% endif %} id="defaultCheck1">
+                        <label class="form-check-label" for="defaultCheck1">
+                            Скрыть выполненные
+                        </label>
+                    </div>
+                    <div class="filter_col col-2">
+                        {#                    <input type="hidden" name="tab_status" id="tab_status">#}
+                        <div class="form-check-inline buttons_row">
+                            <button class="btn btn-primary save" type="submit">Найти</button>
+                            <a href="{% url 'tasks-list' %}"
+                               class="btn btn-outline-primary btn-default clear">Очистить</a>
+                        </div>
+                    </div>
+                    <div class="filter_col col-9" style="font-size: smaller">
+
+                    </div>
+                </div>
+{% endcomment %}
+
+            </form>
+        </nav>
+    <div id="tasks_block" class="table-responsive">
+        <table id="table_data" class="table table-bordered table-striped">
+            {#            <div class="col-md-12">#}
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Время создания</th>
+                <th>Адрес</th>
+                <th>Ресурс</th>
+                <th>Действие</th>
+                <th>Начало</th>
+                <th>Завершение</th>
+                <th>Комментарий</th>
+            </tr>
+            </thead>
+
+            {% for chart in object_list %}
+                <tr>
+                    <td><a href="{{ chart.get_absolute_url }}">{% if chart.id %}№{{ chart.id }}{% endif %}</a></td>
+                    <td>{% if chart.created_on %}{{ chart.created_on|date:"d.m.y H:i" }}{% endif %}</td>
+                    <td>{% if chart.address %}{{ chart.address }}{% endif %}</td>
+                    <td>{% if chart.resource %}{{ chart.resource }}{% endif %}</td>
+                    <td>{% if chart.act %}{{ chart.act }}{% endif %}</td>
+                    <td>{% if chart.start_time %}{{ chart.start_time }}{% endif %}</td>
+                    <td>{% if chart.stop_time %}{{ chart.stop_time }}{% endif %}</td>
+                    <td>{% if chart.description %}{{ chart.description }}{% endif %}</td>
+                </tr>
+            {% endfor %}
+
+            <b>
+
+                {% if object_list %}
+                {% else %}
+                    <p class="text-danger">По таким параметрам в журнале заявок нет.</p>
+                {% endif %}
+            </b>
+
+            </tbody>
+        </table>
+    </div>
+
+
+    {% include "paginator.html" %}
+    {#    {% include "ajax.js" %}#}
+    {#    <script src="{% static 'js/ajax.js' %}"></script>#}
+
+    {% endlocaltime %}
+{% endblock %}
+
+
+
+
+{#{% block extra_js_block %}{% endblock extra_js_block %}#}
+{##}
+{#{% block moment_js_block %}{% endblock moment_js_block %}#}
+{##}
+{#{% block js_block %}{% endblock js_block %}#}
+
+

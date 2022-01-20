@@ -1,0 +1,138 @@
+{% load static %}
+
+<div id="tasks_block" class="table-responsive">
+    <table id="table_data" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>№/Дата</th>
+            <th>Адрес/Телефон/ФИО</th>
+            <!--             <th>Телефон/ФИО</th>
+             -->
+            <th>Содержание/Комментарий</th>
+            <th>Передано</th>
+            <th>Источник/Статус</th>
+        </tr>
+        </thead>
+{% comment %}
+        {% if errors %}
+            <p style="color: red;">{% for error in errors %}{{ error }}{% endfor %}</p>
+        {% endif %}
+{% endcomment %}
+
+
+        {% for task in object_list %}
+            <tr>
+                <td>
+                    <a href="{{ task.get_absolute_url }}">№{{ task.id }}</a>
+                    <nobr>от {{ task.created_on|date:"d.m.y H:i" }}</nobr>
+                    {% if task.get_name %}
+                        <div style="font-size: small">
+                            <nobr>{{ task.get_name.0 }}</nobr>
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if task.address %}
+                        <nobr><b>{{ task.address }}</b></nobr>{% endif %}{% if task.apartment %},<br>
+                    кв.{{ task.apartment }}{% endif %}{% if task.porch %},
+                    п.{{ task.porch }}{% endif %}{% if task.floor %},
+                    эт.{{ task.floor }}{% endif %}
+                    <br>
+                    {% if task.phone %}{{ task.phone }}{% endif %}
+                    <br>
+                    {% if task.surname_name %}{{ task.surname_name }}{% endif %}
+                    {% if task.first_name %}{{ task.first_name }}{% endif %}
+                    {% if task.patronymic_name %}{{ task.patronymic_name }}{% endif %}
+                    {% if task.author_eds %}{{ task.author_eds }}{% endif %}
+                </td>
+
+                <td>
+                    {% if task.description %}
+                        <strong>Содержание:</strong>
+                            {% if "повтор" in task.description|lower %}
+                                <b class="text-danger">{{ task.description }}</b>
+                            {% else %}
+                                {{ task.description }}
+                            {% endif %}
+                    {% endif %}
+
+                    {% with task.tasks_comments.all as query %}
+                        {% if query %}
+{#                            {% if task.description %}#}
+                            {% if task.comment_status %}
+                                <p><strong>Комментарий:</strong>
+                            {% endif %}
+                        {% for comment in query %}
+                            {% if comment.comment %}
+                                <br><b>от {{ comment.commented_on|date:'d.m.Y, H:i' }} </b>
+                                {% if "повтор" in comment.comment|lower %}
+                                    <b class="text-danger">{{ comment.comment }}</b>
+                                {% else %}
+                                    {{ comment.comment }}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% else %}
+                            {% if task.comment_status %}<p><strong>Комментарий:</strong> {{ task.comment_status }}</p>
+                            {% endif %}
+                            </p>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+
+                <td>{% if task.reu %}<b>
+                    <nobr>{{ task.reu }}{% endif %}{% if task.executor %},</nobr></b>
+                    <nobr>{{ task.executor }}{% endif %}{% if task.transmission_time %}{% if task.executor %}, в</nobr>
+                {% endif %}
+                    {{ task.transmission_time }}{% endif %}
+                </td>
+                <td>
+                    {% if task.source_task %}
+                        {% ifequal task.source_task "администрация" %}
+                            <b class="text-danger">{{ task.source_task }}</b>
+                        {% else %}
+                            {{ task.source_task }}
+                        {% endifequal %}
+                        <br>
+                    {% endif %}
+                    {% if task.status_task %}
+                        {% ifequal task.status_task "в работе" %}
+                            <font color="#8b0000">
+                                <b>{{ task.status_task }}</b>
+                            </font>
+                        {% endifequal %}
+                        {% ifequal task.status_task "дополнительный контроль" %}
+                            <font color="#d2691e">
+                                <b>{{ task.status_task }}</b>
+                            </font>
+                        {% endifequal %}
+                        {% ifequal task.status_task "выполнена" %}
+                            <font color="#006400">
+                                {% if task.status_time %}
+                                    <b>{{ task.status_task }}</b>
+                                    <nobr>{{ task.status_time|date:'d.m.Y H:i' }}</nobr>
+                                {% else %}
+                                    <b>{{ task.status_task }}</b>
+                                {% endif %}
+                            </font>
+                        {% endifequal %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+        <b>
+            {% if object_list %}
+            {% else %}
+                <p class="text-danger">По таким параметрам в журнале заявок нет.</p>
+            {% endif %}
+        </b>
+
+        </tbody>
+    </table>
+</div>
+
+{% block js_block %}
+    <script type="text/javascript" src="{% static 'js/ajax.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/reload.js' %}"></script>
+{% endblock js_block %}

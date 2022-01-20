@@ -1,0 +1,83 @@
+{% load compress %}
+{% load cache %}
+{% load static %}
+
+{#{% load bootstrap4 %}#}
+{#{% load bootstrap_form %}#}
+{#{% bootstrap_css %}#}
+{#{% bootstrap_javascript jquery='full' %}#}
+
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "head.html" %}
+
+
+<body>
+{% comment %}
+{% load tz %}
+{% localtime on %}
+{% endcomment %}
+{% if user.is_authenticated %}
+    {% include "navbar.html" %}
+{% endif %}
+
+{#<div class="table">#}
+{% block content %}{% endblock content %}
+{% block js_block %}{% endblock js_block %}
+
+
+{#</div>#}
+
+{#{% bootstrap_javascript jquery='full' %}#}
+
+{% comment %}
+<script>
+    var old_id;
+
+    function return_last_id(data) {
+        $.ajax({
+            url: '/tasks/tasks/return_last_id/',
+            type: 'GET',
+            data: data,
+            cache: true,
+            success: function (data) {
+                if (old_id < data.id) {
+                    reload()
+                }
+                old_id = data.id;
+            },
+            error: function () {
+                console.log('error')
+            }
+        });
+    }
+
+
+    function reload() {
+        $('.table').html('').load(
+            {#"{% url 'tasks-list' %}"#}
+            $('#tasks_filter').submit()
+        );
+
+    }
+
+    setInterval(return_last_id, 15000);
+</script>
+{% endcomment %}
+
+{#<script type="text/javascript" src="{% static 'js/ajax.js' %}"></script>#}
+{#<script type="text/javascript" src="{% static 'js/reload.js' %}"></script>#}
+{#<script type="text/javascript" src="{% static 'js/info_tel.js' %}"></script>#}
+
+{#<script src="{% static 'js/info_adr.js' %}"></script>#}
+
+
+{% comment %}{{ form.media }}{% endcomment %}
+{{ form.media.css }}
+{{ form.media.js }}
+
+</body>
+
+
+</html>

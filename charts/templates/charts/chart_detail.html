@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% if chart.id %}<p><strong>Номер:</strong> {{ chart.id }} </p>{% endif %}
+    {% if chart.created_on %}<p><strong>Дата создания:</strong> {{ chart.created_on }} </p>{% endif %}
+    {% if chart.address %}<p><strong>Адрес:</strong> {{ chart.address }} </p>{% endif %}
+    {% if chart.resource %}<p><strong>Ресурс:</strong> {{ chart.resource }} </p>{% endif %}
+    {% if chart.act %}<p><strong>Действие:</strong> {{ chart.act }} </p>{% endif %}
+    {% if chart.start_time %}<p><strong>Начало:</strong> {{ chart.start_time }} </p>{% endif %}
+    {% if chart.stop_time %}<p><strong>Завершение:</strong> {{ chart.stop_time }} </p>{% endif %}
+    {% if chart.description %}<p><strong>Комментарий:</strong> {{ chart.description }} </p>{% endif %}
+
+<a class="btn btn-primary" href="{% url 'chart-list' %}" role="button">Назад</a>
+<a class="btn btn-primary" href="{% url 'chart_update'  chart.pk%}" role="button">Изменить</a>
+<a class="btn btn-secondary" href="{% url 'chart_delete'  chart.pk%}" role="button">Удалить</a>
+
+{% endblock %}
+

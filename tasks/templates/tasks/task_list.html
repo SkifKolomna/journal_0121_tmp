@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% comment %}
+
+{#{% load staticfiles %}#}
+{#{% load static %}#}
+
+{% endcomment %}
+{% block content %}
+
+    {% load tz %}
+    {% localtime on %}
+        {% load bootstrap4 %}
+
+        <!-- heading_create ends here  блок фильтрации-->
+
+        {% include 'tasks/task_filter.html' %}
+
+        {% if errors %}
+            <b><p class="text-danger">{% for error in errors %}{{ error }}{% endfor %}</p></b>
+        {% endif %}
+
+        {#        <div class="table">#}
+        {% include 'tasks/task_table.html' %}
+
+        {#        </div>#}
+        {% comment %}        <script>
+            var old_id;
+
+            function return_last_id(data) {
+                $.ajax({
+                    url: '/tasks/tasks/return_last_id/',
+                    type: 'GET',
+                    data: data,
+                    cache: true,
+                    success: function (data) {
+                        if (old_id < data.id) {
+                            reload()
+                        }
+                        old_id = data.id;
+                    },
+                    error: function () {
+                        console.log('error')
+                    }
+                });
+            }
+
+
+            function reload() {
+                $('.table').html('').load(
+                    "{% url 'tasks-list' %}"
+                    {#$('#tasks_filter').submit()#}
+                );
+
+            }
+
+            setInterval(return_last_id, 15000);
+        </script>{% endcomment %}
+
+
+        {% include "paginator.html" %}
+
+        {% comment %}
+        {#    {% include "ajax.js" %}#}
+        {#    <script src="{% static 'js/ajax.js' %}"></script>#}
+
+{% endcomment %}
+
+    {% endlocaltime %}
+
+{% endblock content %}
+{% block js_block %}{% endblock js_block %}
+{% comment %}
+
+
+
+
+{#{% block extra_js_block %}{% endblock extra_js_block %}#}
+{##}
+{#{% block moment_js_block %}{% endblock moment_js_block %}#}
+{##}
+{#{% block js_block %}{% endblock js_block %}#}
+{% endcomment %}
+
+

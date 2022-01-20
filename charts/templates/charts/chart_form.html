@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+  <style type="text/css">
+    select {
+      width: 358px;
+    }
+  </style>
+
+    <form action="" method="post" id="chart_form">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <button id="submit_btn" class="btn btn-primary save" type="submit">Сохранить</button>
+    </form>
+
+    <script type="text/javascript">
+        window.onerror = function (msg) {
+            $("body").attr("JSError", msg);
+        }
+    </script>
+    {{ form.media }}
+{% endblock content %}
+{% block js_block %}
+    <script type="text/javascript" src="{% static 'js/info_tel.js' %}"></script>
+{% endblock js_block %}

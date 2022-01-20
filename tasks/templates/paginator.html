@@ -1,0 +1,30 @@
+<ul id="pagination" class="pagination justify-content-center">
+    {% if object_list.has_previous %}
+        <li class="page-item">
+            <a class="page-link"
+               href="{{ request.path }}?page={{ object_list.paginator.has_previous }}">&lt;&lt;</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="{{ request.path }}?page={{ object_list.previous_page_number }}">&lt;</a>
+        </li>
+    {% endif %}
+    {% for i in object_list.paginator.page_range %}
+        {% if i <= object_list.number|add:5 and i >= object_list.number|add:-5 %}
+            {% if object_list.number == i %}
+                <li class="page-item active"><a class="page-link" href="{{ request.path }}?page={{ i }}">{{ i }}</a>
+                </li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="{{ request.path }}?page={{ i }}">{{ i }}</a>
+                </li>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if object_list.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ request.path }}?page={{ object_list.next_page_number }}">&gt;</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="{{ request.path }}?page={{ object_list.paginator.num_pages }}">&gt;&gt;</a>
+        </li>
+    {% endif %}
+</ul>

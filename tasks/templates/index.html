@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% block navbar %}{% endblock %}
+{% block content %}
+    <style>
+        table {
+        {#margin: 25px 0;#} text-align: left;
+        {#border-collapse: separate;#} border: 1px solid #ddd;
+            border-spacing: 5px;
+            border-radius: 3px;
+            background: #fdfdfd;
+            font-size: 14px;
+            width: auto;
+            vertical-align: top;
+        }
+
+        td, th {
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 3px;
+            vertical-align: top;
+        }
+    </style>
+    <div class="container">
+{% comment %}
+
+        <h1>Диспетчерская служба</h1>
+
+        <p>Добро пожаловать в журнал <em>Заявок</em>.</p>
+
+{% endcomment %}
+        <h2>Содержимое журнала</h2>
+
+        <p>Журнал имеет следующее количество записей:</p>
+        <table>
+            <tr>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задач всего:</strong>
+                        </td>
+                        <td>
+                            {{ num_all_tasks }}
+                        </td>
+                        {% for key, value in all_task.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задачи в работе:</strong>
+                        </td>
+                        <td>
+                            {{ num_in_work }}
+                        </td>
+                        {% for key, value in work.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задачи на допконтроле:</strong>
+                        </td>
+                        <td>
+                            {{ num_dop_controll }}
+                        </td>
+                        {% for key, value in control.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задачи выполненных:</strong>
+                        </td>
+                        <td>
+                            {{ num_completed }}
+                        </td>
+                        {% for key, value in close.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <br>
+
+        <table>
+            <tr>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задач всего день:</strong>
+                        </td>
+                        <td>
+                            {{ day_num_all_tasks }}
+                        </td>
+                        {% for key, value in day_all_task.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}</table>
+                </td>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задачи в работе день:</strong>
+                        </td>
+                        <td>
+                            {{ day_num_in_work }}
+                        </td>
+
+                        {% for key, value in day_work.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}</table>
+                </td>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задачи на допконтроле день:</strong>
+                        </td>
+                        <td>
+                            {{ day_num_dop_controll }}
+                        </td>
+                        {% for key, value in day_control.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}</table>
+                </td>
+                <td>
+                    <table style="border: hidden">
+                        <td>
+                            <strong>Задачи выполненных день:</strong>
+                        </td>
+                        <td>
+                            {{ day_num_completed }}
+                        </td>
+                        {% for key, value in day_close.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}</table>
+                </td>
+            </tr>
+        </table>
+    <br>
+
+        {% comment %}
+        <ul>
+            <li><strong>Задач всего:</strong> {{ num_all_tasks }}</li>
+            <ul>
+                {% for key, value in all_task.items %}
+                    <li>{{ key }} - {{ value }}</li>
+                {% endfor %}
+            </ul>
+
+            <li><strong>Задачи в работе:</strong> {{ num_in_work }}</li>
+            <ul>
+                {% for key, value in work.items %}
+                    <li>{{ key }} - {{ value }}</li>
+                {% endfor %}
+            </ul>
+            <li><strong>Задачи на допконтроле:</strong> {{ num_dop_controll }}</li>
+            <ul>
+                {% for key, value in control.items %}
+                    <li>{{ key }} - {{ value }}</li>
+                {% endfor %}
+            </ul>
+
+            <li><strong>Задачи выполненных:</strong> {{ num_completed }}</li>
+            <ul>
+                {% for key, value in close.items %}
+                    <li>{{ key }} - {{ value }}</li>
+                {% endfor %}
+            </ul>
+
+            {#    <li><strong>Books:</strong> {{ num_books }}</li>#}
+            {#    <li><strong>Copies:</strong> {{ num_instances }}</li>#}
+            {#    <li><strong>Copies available:</strong> {{ num_instances_available }}</li>#}
+            {#    <li><strong>Authors:</strong> {{ num_authors }}</li>#}
+        </ul>
+{% endcomment %}
+    </div>
+
+    {% comment %}
+    {#    {{ form.media.css }}#}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    {{ form }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ form.media }}
+{% endcomment %}
+{% endblock %}

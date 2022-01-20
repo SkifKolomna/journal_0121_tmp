@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load static %}
+{% block extralinks %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css"/>
+    <style>
+        .form-group label {
+            font-weight: 800;
+        }
+
+        #editor-container {
+            height: 20rem;
+        }
+    </style>
+{% endblock extralinks %}
+{% block content %}
+
+    {% if task_obj.created_by %}<p><strong>Оператор: </strong>{{ task_obj.get_name.1 }}</p>{% endif %}
+    {% if task_obj.id %}<p><strong>Заявка:</strong> №{{ task_obj.id }} {% endif %}
+{% if task_obj.created_on %}от {{ task_obj.created_on|date:'d.m.Y, H:i' }} </p>{% endif %}
+    {% if task_obj.address %}<p><strong>Адрес: </strong>{{ task_obj.address }}{% endif %}{% if task_obj.apartment %},
+    кв.{{ task_obj.apartment }}{% endif %}{% if task_obj.porch %},
+    п.{{ task_obj.porch }}{% endif %}{% if task_obj.floor %},
+    эт.{{ task_obj.floor }}{% endif %}{% if task_obj.phone %},
+    т.{{ task_obj.phone }}</p>{% endif %}
+    {% if task_obj.source_task %}<p><strong>Инициатор: </strong>{{ task_obj.source_task }} {% endif %}
+{% if task_obj.surname_name %}{{ task_obj.surname_name }} {% endif %}
+{% if task_obj.first_name %}{{ task_obj.first_name }} {% endif %}
+{% if task_obj.patronymic_name %}{{ task_obj.patronymic_name }}{% endif %}
+{% if task_obj.author_eds %}{{ task_obj.author_eds }}</p>{% endif %}
+    {% if task_obj.category %}<p><strong>Категория:</strong> {{ task_obj.category }}{% endif %}
+{% if task_obj.category %}<strong>исполнить</strong> до
+    {{ task_obj.created_on|add:task_obj.category.deadline|date:'d.m.Y, H:i' }} </p>{% endif %}
+    {% if task_obj.description %}<p><strong>Содержание:</strong> {{ task_obj.description }} </p>{% endif %}
+    {% if task_obj.reu %}<p><strong>Исполнитель: </strong>{{ task_obj.reu }}{% endif %}{% if task_obj.executor %},
+    передано {{ task_obj.executor }}{% endif %}{% if task_obj.transmission_time %}
+    в {{ task_obj.transmission_time }}</p>{% endif %}
+
+
+    {% comment %}
+    {% if task_obj.status_task %}
+        <p><strong>Статус:</strong> {{ task_obj.status_task }}
+            {% if task_obj.status_time %}
+                {{ task_obj.status_time }} </p>
+            {% endif %}
+    {% endif %}
+{% endcomment %}
+
+
+    {% comment %}
+    {% if task_obj.comment_status %}<p><strong>Комментарий:</strong> {{ task_obj.comment_status }} </p>{% endif %}
+{% endcomment %}
+
+    <!-- перебор и вывод статусов и комментариев -->
+    {% with task_obj.tasks_comments.all as query %}
+        {% if query %}
+            {% if status_on %}
+                <p><strong>Статус:</strong>
+            {% endif %}
+        {% for status in query %}
+            {% if status.status_task %}
+                <br><b>от {{ status.commented_on|date:'d.m.Y, H:i' }} </b>{{ status.status_task }}
+            {% endif %}
+        {% endfor %}
+        {% else %}
+            {% if task_obj.status_task %}<p><strong>Статус:</strong> {{ task_obj.status_task }}
+            {% endif %}
+        {% if task_obj.status_time %}{{ task_obj.status_time|date:'d.m.Y, H:i' }} </p>{% endif %}
+            </p>
+        {% endif %}
+
+        {% if query %}
+            {% if comment_on %}
+                <p><strong>Комментарий:</strong>
+            {% endif %}
+        {% for comment in query %}
+            {% if comment.comment %}
+                <br><b>от {{ comment.commented_on|date:'d.m.Y, H:i' }} </b>{{ comment.comment }}
+            {% endif %}
+        {% endfor %}
+        {% else %}
+            {% if task_obj.comment_status %}<p><strong>Комментарий:</strong> {{ task_obj.comment_status }}</p>
+            {% endif %}
+            </p>
+        {% endif %}
+    {% endwith %}
+
+
+    <br><a class="btn btn-primary" href="{% url 'tasks_task:tasks-list' %}" role="button">Назад</a>
+    {% ifnotequal task_obj.status_task "выполнена" %}
+        <a class="btn btn-primary" href="{% url 'tasks_task:task_update'  task_obj.pk %}" role="button">Изменить
+            заявку</a>
+    {% endifnotequal %}
+    {% comment %}
+        <a class="btn btn-primary" href="{% url 'tasks_task:task_update'  task_obj.pk %}" role="button">Изменить
+            заявку</a>
+{% endcomment %}
+    {#    <a class="btn btn-secondary" href="{% url 'tasks_task:task_delete'  task_obj.pk%}" role="button">Удалить заявку</a>#}
+    {% comment %}
+    <a class="btn btn-primary" href="{% url 'add_status'  task_obj.pk %}" role="button">Добавить статус</a>
+{% endcomment %}
+    {% if task_obj.reu %}
+        {% ifequal task_obj.reu "Аварийная служба" %}
+            <a class="btn btn-primary" href="{% url 'tasks_task:print_alarm_task' task_obj.pk %}"
+               role="button">Распечатать</a>
+        {% else %}
+            <a class="btn btn-primary hidden" href="{% url 'tasks_task:print_alarm_task' task_obj.pk %}" role="button">Распечатать</a>
+        {% endifequal %}
+    {% endif %}
+
+
+    <!-- Comments Section starts-->
+    <div class="card-body" id="datashow">
+        <div class="card-title">
+            <h5>Комментарии</h5>
+        </div>
+        <div class="row marl">
+            <div class="col-md-12">
+                <form action="{% url 'tasks_task:add_comment' %}" action="/"
+                <form action="{% url 'tasks_task:add_comment' %}"
+                      id="comment_form"
+                      method="POST"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {#                    {% csrf_token %}#}
+                    {#                    {{form}}#}
+                    <div class="form-group">
+
+
+                        {#                        {{ form }}#}
+                        <select name="status_task" id="id_status_task" class="form-control">
+                            <option value="">------ Статус ------</option>
+                            <option value="в работе">В работе</option>
+                            <option value="дополнительный контроль">Дополнительный контроль</option>
+                            <option value="выполнена">Выполнена</option>
+
+
+                        </select>
+
+                        {#                        <select name="status_task" id="id_status_task">#}
+                        {#                            <option value="">---------</option>#}
+                        {##}
+                        {#                            <option value="в работе" selected="">В работе</option>#}
+                        {##}
+                        {#                            <option value="выполнена">Выполнена</option>#}
+                        {##}
+                        {#                            <option value="дополнительный контроль">Дополнительный контроль</option>#}
+                        {##}
+                        {#                        </select>#}
+
+
+                        <textarea class="form-control mentions" textarea cols="40" rows="3" id="id_comments"
+                                  name="comment" placeholder="Оставьте свои комментарии здесь"></textarea>
+                        <div>
+                            <p id="CommentError" style="display:none; color:red"></p>
+                        </div>
+                        </br>
+                        <div class="buttons_row">
+                            <button class="btn btn-primary"
+                                    {#                                    class="btn btn-default save" style="text-align: center;"#}
+                                    id="comment_submit"
+                                    type="submit">Отправить
+                            </button>
+                        </div>
+                    </div>
+                    <input hidden value="{{ task_obj.id }}" name="taskid">
+                </form>
+                <ul class="list-group" id="comments_div">
+{#                    {% csrf_token %}#}
+                    {% for comment in comments %}
+                        <li class="list-group-item list-row" id="comment{{ comment.id }}">
+                            {% if request.user.is_superuser or request.user.role == 'ADMIN' or request.user == comment.commented_by %}
+                                <div class="list-row-buttons btn-group float-right">
+                                    <button class="btn primary_btn btn-sm dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            type="button">Действие<span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu text-center comment_actions"
+                                        style="width: fit-content; min-width: -webkit-fill-available;">
+                                        <li>
+                                            <a class="action edit_comment"
+                                               onclick="edit_comment({{ comment.id }})"
+                                               id="{% url 'tasks:edit_comment' comment.id %}"
+                                               style="padding: 0.5em; text-align: left; font-weight: 600;">Редактировать</a>
+                                        </li>
+                                        <li>
+                                            <a class="action remove_comment"
+                                               onclick="remove_comment({{ comment.id }})"
+                                               style="padding: 0.5em; text-align: left; font-weight: 600;">Удалить</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            {% if comment.comment %}<b>Комментарий:</b>{% endif %}
+                            <div class="stream-post-container" id="comment_name{{ comment.id }}">
+                                {% if comment.comment %}{{ comment.comment }}{% endif %}</div>
+                            {% if comment.status_task %}<b>Статус:</b>{% endif %}
+                            <div class="stream-post-container" id="status_task{{ comment.id }}">
+                                {% if comment.status_task %}{{ comment.status_task }}{% endif %}</div>
+                            <div class="stream-container">
+                                <pre class="float-left"><b>Оператор:</b> {{ comment.created_by.0 }}</pre>
+                                <pre class="float-right date"><b>Дата:</b> {{ comment.commented_on|date:'d.m.Y, H:i:s' }}</pre>
+                                {#                                <pre class="float-right date"title="{{ comment.commented_on }}">{{ comment.commented_on_arrow }}</pre>#}
+                            </div>
+                        </li>
+
+                    {% endfor %}
+                    {#                            <pre>{{ comment.comment }}</pre>#}
+                    {#<pre>{{ comment.status_task }}</pre>#}
+                </ul>
+            </div>
+        </div>
+        <div class="modal fade" id="Comments_Accounts_Modal" role="dialog"
+             data-keyboard="false"
+             data-backdrop="static">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Обновите свой комментарий.</h4>
+
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">&times;
+                        </button>
+                    </div>
+                    <form id="comment_edit_form" method="POST">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div>
+                                    <select name="status_task" id="id_status_task_modal" class="form-control">
+                                        <option value="">------ Статус ------</option>
+                                        <option value="в работе">В работе</option>
+                                        <option value="дополнительный контроль">Дополнительный контроль</option>
+                                        <option value="выполнена">Выполнена</option>
+                                    </select>
+                                </div>
+                                <textarea
+                                        class="form-control mentions" textarea cols="40"
+                                        rows="3"
+                                        id="id_editcomment"
+                                        name="comment"
+                                        placeholder="Отправьте свои комментарии">
+                            </textarea>
+                                <span><i id="CommentEditError"
+                                         style="display:none; color:red"></i></span>
+                                {#                                <input value="{{ task_obj.id }}" name="accountid">#}
+                                <input hidden value="" name="commentid" id="commentid">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary"
+                                    id="comment_edit"
+                                    type="submit">Обновить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section Ends-->
+
+    {% comment %}
+    <!-- -->
+    <button id="button_test">Trigger submit</button>
+    <br><br>
+    <form>
+        <input type="text" name="login" placeholder="Login" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="submit">
+    </form>
+{% endcomment %}
+
+
+
+
+    {% comment %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Использование jQuery метода .submit() (без параметров и с функцией)</title>
+{#        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>#}
+        <script>
+            $(document).ready(function () {
+                $("button").click(function () { // задаем функцию при нажатиии на элемент <button>
+                    $("form").submit(); // вызываем событие submit на элементе <form>
+                });
+                $("form").submit(function (event) { // задаем функцию при срабатывании события "submit" на элементе <form>
+                    event.preventDefault(); // действие события по умолчанию не будет срабатывать
+                    $("span").text("Form submitted") // добавляем текстовое содержимое в элемент <span>
+                        .css({
+                            "display": "inline", // элемент <span> отображается как строчный
+                            "color": "forestgreen" // цвет текста светло-зеленый
+                        })
+                        .fadeOut(1000); //  плавно изменяем прозрачность элемента <span> за 1 секунду
+                });
+            });
+        </script>
+    </head>
+    <body>
+    <button>Trigger submit</button>
+    <br><br>
+    <form>
+        <input type="text" name="login" placeholder="Login" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="submit">
+    </form>
+    </body>
+    </html>
+{% endcomment %}
+
+
+
+
+
+
+
+
+{% endblock content %}
+
+
+{% block js_block %}
+    {#    <script type="text/javascript" src="{% static 'js/reload.js' %}"></script>#}
+    <script type="text/javascript">
+        {% comment %}
+                let assigned_to_list = "{{ assigned_data }}";
+                assigned_to_list = JSON.parse(assigned_to_list.replace(/&(l|g|quo)t;/g, function (a, b) {
+                    return {
+                        l: '<',
+                        g: '>',
+                        quo: '"'
+                    }[b];
+                }));
+        {% endcomment %}
+
+
+        /*Comment Add Js Start*/
+        $("#comment_form").submit(function (e) {
+            e.preventDefault();
+            let formData = new FormData($("#comment_form")[0]);
+            {#var csrf_token = $('#comment_form[name="csrfmiddlewaretoken"]').val();#}
+            {#data["csrfmiddlewaretoken"] = csrf_token;#}
+            {#formData["csrfmiddlewaretoken"] = {% csrf_token %};#}
+            {#data["csrfmiddlewaretoken"] = {% csrf_token %};#}
+            {#console.log(csrf_token);#}
+            $.ajax({
+                {#url: "{% url 'common:add_comment_tak' %}",#}
+                {#url: "{% url 'common_task:add_comment' %}",#}
+                {#url: "{% url 'add_comment' %}",#}
+                {#url: "/common/add_comment/",#}
+                url: "{% url 'tasks_task:add_comment' %}",
+                type: "POST",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function (xhr, settings) {xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")},
+                success: function (data) {
+                    {#console.log('success');#}
+                    {#console.log(formData);#}
+                    if (data.error) {
+                        for (var key in data.error) {
+                            console.log(key);
+                            $("#CommentError").html(data.error[key]).show()
+                        }
+                    } else {
+                        d = new Date(data.commented_on);
+                        console.log(data.commented_on);
+                        let comment;
+                        if (data.comment) {
+                            comment = data.comment
+                        } else {
+                            comment = ''
+                        }
+                        console.log(comment);
+
+                        let status_task;
+                        if (data.status_task) {
+                            status_task = data.status_task
+                        } else {
+                            status_task = ''
+                        }
+                        console.log(status_task);
+                        $("#comments_div").prepend("<li class='list-group-item list-row' id='comment" + data.comment_id + "'>" +
+                            "<div class='float-right right-container'>" +
+                            "<div class='list-row-buttons btn-group float-right'>" +
+                            "<button class='btn primary_btn btn-sm dropdown-toggle' data-toggle='dropdown' type='button'><span class='caret'></span>Действие</button>" +
+                            "<ul class='dropdown-menu text-center'>" +
+                            "<li><a class='action' onclick='edit_comment(" + data.comment_id + ")'>Редактировать</a></li>" +
+                            "<li><a class='action' onclick='remove_comment(" + data.comment_id + ")''>Удалить</a></li></ul></div></div>" +
+                            {#"<div class='stream-post-container' id='comment_name" + data.comment_id + "'><pre>" + data.comment + "</pre></div>" +#}
+                            ///{#"<div class='stream-post-container' id='status_task" + data.comment_id + "'><pre>" + data.status_task + "</pre></div>" +#}
+                            {#"<div class='stream-post-container' id='comment_name" + data.comment_id + "'><pre>" + data.comment + "</pre></div>" +#}
+                            "<div class='stream-post-container' id='comment_name" + data.comment_id + "'>" + comment + "</div>" +
+                            ///{#"<div class='stream-post-container' id='status_task" + data.comment_id + "'><pre>" + data.status_task + "</pre></div>" +#}
+                            "<div class='stream-post-container' id='status_task" + data.comment_id + "'>" + status_task + "</div>" +
+                            "<div class='stream-container'><pre class='float-left'>" + data.commented_by + "</pre><pre class='float-right'>" +
+                            d.toLocaleString('ru-RU', {hour24: true}) + "</pre></div>"
+                        );
+                        $("#id_comments").val('');
+                        $("#id_status_task").val('');
+                        alert("Комментарий отправлен");
+                        $("#CommentError").html("")
+                        window.location.reload();
+                    }
+
+                }
+            });
+        });
+
+
+        // действие --> редактировать
+        function edit_comment(x) {
+            $('#Comments_Accounts_Modal').modal('show');
+            comment = $("#comment_name" + x).text();
+            status_for_modal = $("#status_task" + x).text();
+            if (status_for_modal) {
+                $("#id_status_task_modal").val(status_for_modal);
+            } else {
+                $("#id_status_task_modal").val('');
+            }
+            console.log('status_for_modal', status_for_modal);
+            $("#commentid").val(x);
+            $("#id_editcomment").val(comment);
+            {#$("#edit_file_field").html($("#comment_file_div" + x).clone())#}
+        }
+
+        // действие --> редактировать --> обновить (в модальном окне)
+        $("#comment_edit").click(function (e) {
+            e.preventDefault();
+            var formData = new FormData($("#comment_edit_form")[0]);
+            var commentid = $("#commentid").val();
+            $.ajax({
+                url: "{% url 'tasks_task:edit_comment' 123456 %}".replace(123456, commentid),
+                type: "POST",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+                },
+                success: function (data) {
+                    if (data.error) {
+                        console.log(data.error);
+                        $("#CommentEditError").html(data.error).show()
+                    } else {
+                        $("#id_status_task_modal").val("");
+                        console.log(data.status_task + ' ' + data.comment);
+                        {#console.log($("#comment_name" + data.comment_id));#}
+                        {#$("#comment_name" + data.comment_id).html('<pre>' + data.comment + '</pre>');#}
+                        $("#comment_name" + data.comment_id).html(data.comment);
+                        {#$("#status_task" + data.comment_id).html('<pre>' + data.status_task + '</pre>');#}
+                        $("#status_task" + data.comment_id).html(data.status_task);
+                        $('#Comments_Accounts_Modal').modal('hide');
+                        $("#id_editcomment").val("");
+                        $("#CommentEditError").html('');
+                    }
+                    setTimeout(function () {
+                        window.location.reload()
+                    }, 3000);
+                }
+            })
+        });
+        {#{% if comment.comment %}#}
+        {#                                    <pre>{{ comment.comment }}</pre>{% endif %}#}
+
+        /*Comment Edit Js Ends*/
+
+        function HideError(e) {
+            $("#CommentError").hide();
+            $("#CommentEditError").hide()
+        }
+
+        /*Comment Remove Js Start*/
+
+        function remove_comment(x) {
+            var con = confirm("Вы точно хотите удалить его !?");
+            if (con == true) {
+                $.post('{% url "tasks_task:remove_comment" %}', {
+                    "comment_id": x,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function (data) {
+                    {#data["csrfmiddlewaretoken"] = $('#comment_form[name="csrfmiddlewaretoken"]').val();#}
+                    if (data.error) {
+                        alert(data.error)
+                    } else {
+                        $("#comment" + data.cid).remove();
+                        window.location.reload()
+                    }
+                })
+            }
+        }
+    </script>
+
+
+    {% comment %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#button_test").click(function () { // задаем функцию при нажатиии на элемент <button>
+                $("form").submit(); // вызываем событие submit на элементе <form>
+            });
+            $("form").submit(function (event) { // задаем функцию при срабатывании события "submit" на элементе <form>
+                event.preventDefault(); // действие события по умолчанию не будет срабатывать
+                $("span").text("Form submitted") // добавляем текстовое содержимое в элемент <span>
+                    .css({
+                        "display": "inline", // элемент <span> отображается как строчный
+                        "color": "forestgreen" // цвет текста светло-зеленый
+                    })
+                    .fadeOut(1000); //  плавно изменяем прозрачность элемента <span> за 1 секунду
+            });
+        });
+    </script>
+{% endcomment %}
+    <script src="{% static 'js/ajaxForm.js' %}"></script>
+    <script src="{% static 'js/mention.js' %}"></script>
+{% endblock js_block %}
