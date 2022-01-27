@@ -171,7 +171,7 @@
                     <input hidden value="{{ task_obj.id }}" name="taskid">
                 </form>
                 <ul class="list-group" id="comments_div">
-{#                    {% csrf_token %}#}
+                    {#                    {% csrf_token %}#}
                     {% for comment in comments %}
                         <li class="list-group-item list-row" id="comment{{ comment.id }}">
                             {% if request.user.is_superuser or request.user.role == 'ADMIN' or request.user == comment.commented_by %}
@@ -359,7 +359,9 @@
                 cache: false,
                 contentType: false,
                 processData: false,
-                beforeSend: function (xhr, settings) {xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")},
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}")
+                },
                 success: function (data) {
                     {#console.log('success');#}
                     {#console.log(formData);#}
@@ -517,6 +519,7 @@
         });
     </script>
 {% endcomment %}
+
     <script src="{% static 'js/ajaxForm.js' %}"></script>
     <script src="{% static 'js/mention.js' %}"></script>
 {% endblock js_block %}
