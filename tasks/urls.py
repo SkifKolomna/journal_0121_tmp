@@ -11,6 +11,8 @@ from . import views
 from .forms import TaskForm
 
 app_name = 'tasks'
+verbose_name = '123'
+
 
 urlpatterns = [
     path('journal/', views.index, name='index'),

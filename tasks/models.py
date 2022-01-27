@@ -12,6 +12,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+
 User = get_user_model()
 
 
@@ -21,6 +22,8 @@ class Subdivision(models.Model):
 
     class Meta:
         ordering = ("string_subdivision",)
+        verbose_name = "подразделение"
+        verbose_name_plural = "подразделения"
 
     def __str__(self):
         return self.string_subdivision
@@ -34,6 +37,10 @@ class Profile(models.Model):
     subdivision = models.ForeignKey(Subdivision, on_delete=models.SET_NULL,
                                     null=True, blank=True)
     is_operator = models.BooleanField(_('operator'), default=True)
+
+    class Meta:
+        verbose_name = "профиль"
+        verbose_name_plural = "профили"
 
 
 @receiver(post_save, sender=User)
@@ -55,6 +62,8 @@ class Address(models.Model):
 
     class Meta:
         ordering = ("string_address",)
+        verbose_name = "адрес"
+        verbose_name_plural = "адреса"
 
     def __str__(self):
         return self.string_address
@@ -66,6 +75,8 @@ class Resource(models.Model):
 
     class Meta:
         ordering = ("name",)
+        verbose_name = "ресурс"
+        verbose_name_plural = "ресурсы"
 
     def __str__(self):
         return self.name
@@ -76,6 +87,8 @@ class Act(models.Model):
 
     class Meta:
         ordering = ("name",)
+        verbose_name = "действие"
+        verbose_name_plural = "действия"
 
     def __str__(self):
         return self.name
@@ -89,6 +102,8 @@ class Category(models.Model):
 
     class Meta:
         ordering = ("name",)
+        verbose_name = "категория"
+        verbose_name_plural = "категории"
 
     def __str__(self):
         return self.name
@@ -125,7 +140,6 @@ class Category(models.Model):
 #     def get_absolute_url(self):
 #         # return reverse('task-detail', args=[str(self.id)])
 #         return reverse('task-detail', args=[self.id])
-
 
 
 class Task(models.Model):
@@ -170,6 +184,13 @@ class Task(models.Model):
                                    max_length=100,
                                    related_name='updated_by')
 
+    class Meta:
+        ordering = ['-created_on']
+        verbose_name = 'заявка'
+        verbose_name_plural = 'заявки'
+
+
+
     def get_name(self):
         user = self.created_by
         # if user and user.first_name and user.last_name:
@@ -181,9 +202,6 @@ class Task(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a particular book instance."""
         return reverse('tasks_task:task-detail', args=[str(self.id)])
-
-    class Meta:
-        ordering = ['-created_on']
 
     def __str__(self):
         # return self.title

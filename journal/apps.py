@@ -1,8 +1,8 @@
 from django.apps import AppConfig
 
-VERBOSE_APP_NAME = 'Заявки'
+VERBOSE_APP_NAME = 'Журнал'
 
 
 class TasksConfig(AppConfig):
-    name = 'tasks'
+    name = 'journal'
     verbose_name = VERBOSE_APP_NAME

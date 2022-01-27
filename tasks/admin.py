@@ -2,9 +2,22 @@ from django.contrib import admin
 
 from .models import Task, Address, Resource, Act, Subdivision, Category, Profile
 
+''' 
+https://russianblogs.com/article/32121447496/
+'''
+
+
 # Register your models here.
-admin.site.register(Task)
-# @admin.register(Task)
+# admin.site.register(Task)
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('id', '__str__', 'created_on', 'created_by')
+
+
+# admin.site.site_header = '123'
+# admin.site.site_title = '123'
+# admin.site.index_title = '123'
+
 
 admin.site.register(Category)
 

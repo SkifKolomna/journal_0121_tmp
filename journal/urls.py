@@ -21,6 +21,7 @@ from django.urls import path
 from django.views.generic import RedirectView
 
 app_name = 'journal'
+# verbose_name = '123'
 
 urlpatterns = [
     path('admin/', admin.site.urls),

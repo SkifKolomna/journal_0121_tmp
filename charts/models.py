@@ -28,6 +28,8 @@ class Chart(models.Model):
 
     class Meta:
         ordering = ['-created_on']
+        verbose_name = 'график'
+        verbose_name_plural = 'графики'
 
     def __str__(self):
         return str(self.id)

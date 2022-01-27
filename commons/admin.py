@@ -17,6 +17,7 @@ from .models import Comment
 # admin.site.register(Act)
 
 admin.site.register(Comment)
+# @admin.site.register(Comment):
 
 # @admin.register(Address)
 # class AddressAdmin(admin.ModelAdmin):

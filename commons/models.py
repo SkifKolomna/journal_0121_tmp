@@ -20,12 +20,12 @@ class Comment(models.Model):
                              related_name='tasks_comments',
                              on_delete=models.CASCADE)
     commented_by = models.ForeignKey(User,
-                                   verbose_name='Создана',
-                                   on_delete=models.CASCADE,
-                                   null=True,
-                                   blank=True,
-                                   max_length=100,
-                                   related_name='comment_commented_by')
+                                     verbose_name='Создана',
+                                     on_delete=models.CASCADE,
+                                     null=True,
+                                     blank=True,
+                                     max_length=100,
+                                     related_name='comment_commented_by')
     updated_by = models.ForeignKey(User,
                                    verbose_name='Изменена',
                                    on_delete=models.CASCADE,
@@ -36,6 +36,8 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-commented_on']
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'комментарии'
 
     def __str__(self):
         return str(self.id)
