@@ -1,7 +1,7 @@
 import datetime
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -11,9 +11,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils import timezone, dateformat
-from django.utils.decorators import method_decorator
 from django.views import generic
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from docxtpl import DocxTemplate
 from rest_framework import permissions, generics
@@ -35,7 +33,7 @@ from .serializers import TaskSerializer, TaskInWorkSerializer, CommentSerializer
 
 
 # @csrf_exempt
-def return_tool(request): #54634
+def return_tool(request):  # 54634
     return_dict = dict()
     data = request.POST
     home = data.get("home")
@@ -207,6 +205,7 @@ def timer(func):
 
     return wrapper
 
+
 @login_required
 @timer
 def index(request):
@@ -325,6 +324,7 @@ class TaskListView(PermissionRequiredMixin, generic.ListView):
     model = Task
     template_name = 'tasks/task_list.html'
     permission_required = 'tasks.can_mark_returned'
+
     # paginate_by = 25
 
     def get_queryset(self):
@@ -347,6 +347,11 @@ class TaskListView(PermissionRequiredMixin, generic.ListView):
                 queryset = queryset.filter(phone__icontains=request_post.get('phone_task'))
             if request_post.get('checkbox_hide'):
                 queryset = queryset.exclude(status_task__icontains='выполнена')
+            if request_post.get('start_data'):
+                queryset = queryset.filter(created_on__gte=request_post.get('start_data'))
+            if request_post.get('end_data'):
+                end_data = datetime.strptime(request_post.get('end_data'), '%Y-%m-%d') + timedelta(days=1)
+                queryset = queryset.filter(created_on__lte=end_data)
         return queryset.distinct()
 
     def get_context_data(self, **kwargs):
@@ -360,9 +365,19 @@ class TaskListView(PermissionRequiredMixin, generic.ListView):
         paginator = Paginator(context['object_list'], 20)
         page = self.request.GET.get('page')
         context['form'] = FilterForm(self.request.POST)
-        context['form'].fields['filter_time'].widget.js_options['date'] = self.request.POST.get('filter_time')
+        # context['form'].fields['filter_time'].widget.js_options['date'] = self.request.POST.get('filter_time')
+        start_data = self.request.POST.get('start_data')
+        end_data = self.request.POST.get('end_data')
+        # print(self.request.POST.get('filter_time'))
+        # print(start_data)
+        # print(end_data)
+        # print(context['form'].fields['start_data'].widget.js_options['date'])
+        # print(context['form'].fields['end_data'].widget.js_options['date'])
         context['hidden_home'] = self.request.POST.get('home')
-        number_task =self.request.POST.get('number_task')
+        if start_data and end_data:
+            if start_data > end_data:
+                context['errors'] = 'Дата начала периода должна быть меньше даты завершения периода.'
+        number_task = self.request.POST.get('number_task')
         if number_task:
             if not number_task.isdigit():
                 context['errors'] = 'Поле "Номер заявки" должно содержать целое число.'
@@ -457,6 +472,7 @@ class TaskCreate(PermissionRequiredMixin, CreateView):
     form_class = TaskForm
     # fields = '__all__'
     permission_required = 'tasks.can_mark_returned'
+
     # form_class = TaskForm
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -486,6 +502,7 @@ class TaskUpdate(PermissionRequiredMixin, UpdateView):
     # fields = '__all__'
     # success_url = reverse_lazy('task_update')
     permission_required = 'tasks.can_mark_returned'
+
     # form_class = TaskForm
     def form_valid(self, form):
         form.instance.updated_by = self.request.user
@@ -508,6 +525,7 @@ class TaskDelete(PermissionRequiredMixin, DeleteView):
 
 
 '''' api '''
+
 
 # class TaskView(ReadOnlyModelViewSet):
 class TaskView(ModelViewSet):
@@ -537,6 +555,7 @@ class CommentCreateView(generics.CreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = (IsOwnerOrReadOnly,)
 
+
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
@@ -547,11 +566,9 @@ class TaskApiDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
 
 
-
-
-
 ''' http://garmoncheg.blogspot.com/2013/11/ajax-form-in-django-with-jqueryform.html '''
 '''  https://medium.com/@01701414/how-to-apply-ajax-with-django-2-1-8e9a4943f73 '''
+
 
 # def clone_first_comment(task, comment_form):
 #     comment_form = comment_form.save(commit=False)
@@ -584,6 +601,7 @@ def clone_first_comment(task, comment_form):
     comment_form.save()
     update_comment(task)
 
+
 def clone_first(task):
     comment_form = TaskCommentForm()
     comment_form = comment_form.save(commit=False)
@@ -603,11 +621,11 @@ def clone_first(task):
     comment_form.save()
     update_comment(task)
 
+
 def clone_first_comment_all(request):
     tasks = Task.objects.all()
     for task in tasks:
         clone_first(task)
-
 
 
 def update_comment(task):

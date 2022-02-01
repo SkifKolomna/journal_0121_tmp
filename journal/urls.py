@@ -57,6 +57,5 @@ urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 # добаленно вручную
 urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
-    path('select2/', include('django_select2.urls')),
-
+    path('select2/', include('django_select2.urls', namespace='django_select2')),
 ]

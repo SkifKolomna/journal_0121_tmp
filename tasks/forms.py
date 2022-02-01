@@ -25,7 +25,7 @@ class AddressCustomFilterWidget(ModelSelect2Widget):
 
     def get_context(self, name, value, attrs):
         context = super(AddressCustomFilterWidget, self).get_context(name, value, attrs)
-        context["widget"]["attrs"]['data-placeholder'] = 'Дом'
+        context["widget"]["attrs"]['data-placeholder'] = '------ Дом ------'
         attrs_optgroups = context["widget"]["optgroups"][0][1][0]
         attrs_optgroups['value'] = list(context["widget"]["value"])[0]
         if attrs_optgroups['value']:
@@ -44,17 +44,64 @@ class CategoryCustomTitleWidget(ModelSelect2Widget):
     search_fields = ["name__icontains"]
 
 
-class FilterForm(forms.Form):
-    filter_time = forms.DateField(label=_("Время исполнения"), required=False,
-                                  widget=DatePicker(options={'format': 'YYYY-MM-DD', },
-                                                    attrs={'class': 'form-control datetimepicker-input',
-                                                           'append': 'fa fa-calendar', }),
-                                  )
+'''
+https://simpleisbetterthancomplex.com/tutorial/2019/01/03/how-to-use-date-picker-with-django.html
+'''
 
-    home = forms.ChoiceField(label=_("Дом"),
-                             # widget=AddressCustomFilterWidget(attrs={'class': 'form-control'}), # полный список
-                             widget=AddressCustomFilterWidget(attrs={'class': 'form-control'}),
-                             required=False)
+
+class FilterForm(forms.Form):
+    filter_time = forms.DateField(
+        label=_("Время исполнения"),
+        required=False,
+        widget=DatePicker(
+            options={
+                'format': 'YYYY-MM-DD',
+            },
+            attrs={
+                'class': 'form-control datetimepicker-input',
+                'append': 'fa fa-calendar',
+                'placeholder': 'за день'
+            }
+        ),
+    )
+    start_data = forms.DateField(
+        label=_("Время исполнения"),
+        required=False,
+        widget=DatePicker(
+            options={
+                'format': 'YYYY-MM-DD',
+            },
+            attrs={
+                'class': 'form-control datetimepicker-input',
+                'append': 'fa fa-calendar',
+                'placeholder': 'с даты'
+            }
+        ),
+    )
+    end_data = forms.DateField(
+        label=_("Время исполнения"),
+        required=False,
+        widget=DatePicker(
+            options={
+                'format': 'YYYY-MM-DD',
+            },
+            attrs={
+                'class': 'form-control datetimepicker-input',
+                'append': 'fa fa-calendar',
+                'placeholder': 'по дату'
+            }
+        ),
+    )
+
+    home = forms.ChoiceField(
+        label=_("Дом"),
+        widget=AddressCustomFilterWidget(
+            attrs={
+                # 'class': 'form-control',
+                'class': 'filter_col col - md - 2',
+            }),
+        required=False
+    )
 
     # def __init__(self, *args, **kwargs):
     #     super(FilterForm, self).__init__(*args, **kwargs)
@@ -72,9 +119,9 @@ class TaskCommentForm(forms.ModelForm):
         fields = ('comment', 'task', 'id', 'status_task')
 
 
-
 class TaskForm(forms.ModelForm):
-    transmission_time = forms.TimeField(label=_("Время передачи"), required=False,
+    transmission_time = forms.TimeField(label=_("Время передачи"),
+                                        required=False,
                                         widget=TimePicker(options={
                                             'format': 'LT',
                                             # 'format': 'HH:mm',
@@ -84,7 +131,8 @@ class TaskForm(forms.ModelForm):
                                         ),
                                         )
 
-    status_time = forms.DateTimeField(label=_("Время исполнения"), required=False,
+    status_time = forms.DateTimeField(label=_("Время исполнения"),
+                                      required=False,
                                       widget=DateTimePicker(options={'format': 'L LT', },
                                                             attrs={'class': 'form-control datetimepicker-input',
                                                                    'append': 'fa fa-calendar', }),
@@ -96,7 +144,7 @@ class TaskForm(forms.ModelForm):
         # labels = {'category': 'Категория'}
         labels = {'address': 'Адрес', 'category': 'Категория'}
         widgets = {
-            "address": AddressCustomTitleWidget,
+            "address": AddressCustomTitleWidget(),
             "category": CategoryCustomTitleWidget,
             'author_eds': forms.HiddenInput(),
 
