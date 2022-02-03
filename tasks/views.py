@@ -437,6 +437,9 @@ class TaskDetailView(PermissionRequiredMixin, generic.DetailView):
         # print(status_on)
         comment_on = task_obj.tasks_comments.exclude(comment='').count()
         # print(comment_on)
+        # for o in task_obj:
+        print(task_obj.address)
+        print(task_obj.address.id)
         context.update({
             "task_obj": task_obj,
             "status_on": status_on,

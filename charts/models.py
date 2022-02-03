@@ -13,8 +13,7 @@ class Chart(models.Model):
     #                              related_name="resource_charts")
     # act = models.ForeignKey(Act, on_delete=models.SET_NULL, null=True, blank=True, related_name="act_charts")
 
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True,
-                                related_name="address")
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     resource = models.ForeignKey(Resource, on_delete=models.SET_NULL, null=True, blank=True, )
     act = models.ForeignKey(Act, on_delete=models.SET_NULL, null=True, blank=True)
 

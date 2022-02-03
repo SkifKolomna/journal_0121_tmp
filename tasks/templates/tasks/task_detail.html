@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load staticfiles %}
+{#{% load staticfiles %}#}
 {% load static %}
 {% block extralinks %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
@@ -23,7 +23,7 @@
     {% if task_obj.created_by %}<p><strong>Оператор: </strong>{{ task_obj.get_name.1 }}</p>{% endif %}
     {% if task_obj.id %}<p><strong>Заявка:</strong> №{{ task_obj.id }} {% endif %}
 {% if task_obj.created_on %}от {{ task_obj.created_on|date:'d.m.Y, H:i' }} </p>{% endif %}
-    {% if task_obj.address %}<p><strong>Адрес: </strong>{{ task_obj.address }}{% endif %}{% if task_obj.apartment %},
+    {% if task_obj.address %}<p><strong>Адрес: </strong>{{ task_obj.address.string_address }}{% endif %}{% if task_obj.apartment %},
     кв.{{ task_obj.apartment }}{% endif %}{% if task_obj.porch %},
     п.{{ task_obj.porch }}{% endif %}{% if task_obj.floor %},
     эт.{{ task_obj.floor }}{% endif %}{% if task_obj.phone %},
@@ -91,25 +91,25 @@
     {% endwith %}
 
 
-    <br><a class="btn btn-primary" href="{% url 'tasks_task:tasks-list' %}" role="button">Назад</a>
+    <br><a class="btn btn-primary" href="{% url 'task:tasks-list' %}" role="button">Назад</a>
     {% ifnotequal task_obj.status_task "выполнена" %}
-        <a class="btn btn-primary" href="{% url 'tasks_task:task_update'  task_obj.pk %}" role="button">Изменить
+        <a class="btn btn-primary" href="{% url 'task:task_update'  task_obj.pk %}" role="button">Изменить
             заявку</a>
     {% endifnotequal %}
     {% comment %}
-        <a class="btn btn-primary" href="{% url 'tasks_task:task_update'  task_obj.pk %}" role="button">Изменить
+        <a class="btn btn-primary" href="{% url 'task:task_update'  task_obj.pk %}" role="button">Изменить
             заявку</a>
 {% endcomment %}
-    {#    <a class="btn btn-secondary" href="{% url 'tasks_task:task_delete'  task_obj.pk%}" role="button">Удалить заявку</a>#}
+    {#    <a class="btn btn-secondary" href="{% url 'task:task_delete'  task_obj.pk%}" role="button">Удалить заявку</a>#}
     {% comment %}
     <a class="btn btn-primary" href="{% url 'add_status'  task_obj.pk %}" role="button">Добавить статус</a>
 {% endcomment %}
     {% if task_obj.reu %}
         {% ifequal task_obj.reu "Аварийная служба" %}
-            <a class="btn btn-primary" href="{% url 'tasks_task:print_alarm_task' task_obj.pk %}"
+            <a class="btn btn-primary" href="{% url 'task:print_alarm_task' task_obj.pk %}"
                role="button">Распечатать</a>
         {% else %}
-            <a class="btn btn-primary hidden" href="{% url 'tasks_task:print_alarm_task' task_obj.pk %}" role="button">Распечатать</a>
+            <a class="btn btn-primary hidden" href="{% url 'task:print_alarm_task' task_obj.pk %}" role="button">Распечатать</a>
         {% endifequal %}
     {% endif %}
 
@@ -121,8 +121,8 @@
         </div>
         <div class="row marl">
             <div class="col-md-12">
-                <form action="{% url 'tasks_task:add_comment' %}" action="/"
-                <form action="{% url 'tasks_task:add_comment' %}"
+                <form action="{% url 'task:add_comment' %}" action="/"
+                <form action="{% url 'task:add_comment' %}"
                       id="comment_form"
                       method="POST"
                       enctype="multipart/form-data">
@@ -353,7 +353,7 @@
                 {#url: "{% url 'common_task:add_comment' %}",#}
                 {#url: "{% url 'add_comment' %}",#}
                 {#url: "/common/add_comment/",#}
-                url: "{% url 'tasks_task:add_comment' %}",
+                url: "{% url 'task:add_comment' %}",
                 type: "POST",
                 data: formData,
                 cache: false,
@@ -438,7 +438,7 @@
             var formData = new FormData($("#comment_edit_form")[0]);
             var commentid = $("#commentid").val();
             $.ajax({
-                url: "{% url 'tasks_task:edit_comment' 123456 %}".replace(123456, commentid),
+                url: "{% url 'task:edit_comment' 123456 %}".replace(123456, commentid),
                 type: "POST",
                 data: formData,
                 cache: false,
@@ -484,7 +484,7 @@
         function remove_comment(x) {
             var con = confirm("Вы точно хотите удалить его !?");
             if (con == true) {
-                $.post('{% url "tasks_task:remove_comment" %}', {
+                $.post('{% url "task:remove_comment" %}', {
                     "comment_id": x,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 }, function (data) {

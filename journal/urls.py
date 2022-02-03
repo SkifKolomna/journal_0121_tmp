@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import include
 from django.urls import path
 from django.views.generic import RedirectView
+from .yasg import urlpatterns as doc_urls
 
 app_name = 'journal'
 # verbose_name = '123'
@@ -35,9 +36,9 @@ urlpatterns = [
 # Используйте include() чтобы добавлять URL из каталога приложения
 urlpatterns += [
     # path('', include('commons.urls', namespace="commons")),
-    path('commons/', include('commons.urls')),
+    path('commons/', include('commons.urls', namespace='commons')),
     # path('tasks/', include('tasks.urls')),
-    path('tasks/', include('tasks.urls', namespace='tasks_task')),
+    path('tasks/', include('tasks.urls', namespace='task')),
     # path('tasks/', include('tasks.urls')),
     path('charts/', include('charts.urls')),
     path('reports/', include('reports.urls')),
@@ -59,3 +60,5 @@ urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
     path('select2/', include('django_select2.urls', namespace='django_select2')),
 ]
+
+urlpatterns += doc_urls

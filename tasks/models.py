@@ -189,8 +189,6 @@ class Task(models.Model):
         verbose_name = 'заявка'
         verbose_name_plural = 'заявки'
 
-
-
     def get_name(self):
         user = self.created_by
         # if user and user.first_name and user.last_name:
@@ -201,7 +199,7 @@ class Task(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular book instance."""
-        return reverse('tasks_task:task-detail', args=[str(self.id)])
+        return reverse('tasks:task-detail', args=[str(self.id)])
 
     def __str__(self):
         # return self.title

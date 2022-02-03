@@ -2,15 +2,10 @@ from django import forms
 
 from .models import Comment
 
+class TaskCommentForm(forms.ModelForm):
+    # comment = forms.CharField(max_length=255, required=True)
+    # status_task = forms.ChoiceField(max_length=255, blank=True, null=True, choices=TASK_STATUS)
 
-# class UserCommentForm(forms.ModelForm):
-#     # comment_status = forms.CharField(max_length=64, required=True)
-#     comment = forms.CharField(max_length=64, required=True)
-#
-#     class Meta:
-#         model = Comment
-#         # fields = ('comment', 'user', 'commented_by')
-#         # fields = ('comment_status', 'task', 'created_by')
-#         # fields = ('comment', 'comment_status', 'task', 'commented_by')
-#         # fields = ('commented_by')
-#         fields = ('comment',)
+    class Meta:
+        model = Comment
+        fields = ('comment', 'task', 'id', 'status_task')
